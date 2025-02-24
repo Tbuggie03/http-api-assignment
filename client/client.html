@@ -28,5 +28,37 @@
   </section>
   <section id="content">
   </section>
+  <script>
+    document.getElementById('send').addEventListener('click', async () => {
+      console.log("Send button clicked");
+      const page = document.getElementById('page').value;
+      const type = document.getElementById('type').value;
+
+      try {
+        console.log("Making fetch request to:", page);
+
+        const response = await fetch(page, {
+          headers: { 'Accept': type }
+        });
+
+        const contentType = response.headers.get('Content-Type');
+        const rawText = await response.text();
+        console.log("Raw Response:", rawText);
+
+        let output;
+        if (contentType.includes('application/json')) {
+          output = JSON.parse(rawText);
+        } else if (contentType.includes('text/xml')) {
+          const parser = new DOMParser();
+          output = parser.parseFromString(rawText, 'text/xml');
+        }
+
+        document.getElementById('content').innerText = rawText;
+
+      } catch (error) {
+        console.error("Error fetching API:", error);
+      }
+    });
+  </script>
 </body>
 </html>
